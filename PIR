@@ -1,0 +1,20 @@
+#define PIR 33
+
+int loopDelay; // Declare loopDelay as an integer
+
+void setup() {
+  pinMode(PIR, INPUT);
+  Serial.begin(9600); // Initialize serial communication
+}
+
+void loop() {
+  int pir_status = digitalRead(PIR);
+  if (pir_status == HIGH) {
+    Serial.println("Motion detected!");
+    loopDelay = 3000; // Set delay to 3000ms
+  } else {
+    Serial.println("No Motion detected!");
+    loopDelay = 1000; // Set delay to 1000ms
+  }
+  delay(loopDelay);
+}
