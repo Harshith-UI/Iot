@@ -1,0 +1,61 @@
+Arduino Code:
+#include <Arduino.h>
+#include <IRremoteESP8266.h>
+#include <IRrecv.h>
+#include <IRutils.h>
+// An IR detector/demodulator is connected to GPIO pin 16(D5 on a NodeMCU
+// board).
+// Note: GPIO 16 won't work on the ESP8266 as it does not have interrupts.
+const uint16_t kRecvPin = 4;
+IRrecv irrecv(kRecvPin);
+decode_results results;
+void setup() {
+pinMode(2,OUTPUT);
+pinMode(13,OUTPUT);
+Serial.begin(115200);
+irrecv.enableIRIn(); // Start the receiver
+while (!Serial) // Wait for the serial connection to be establised.
+delay(50);
+Serial.println();
+Serial.print("IRrecvDemo is now running and waiting for IR message on Pin ");
+Serial.println(kRecvPin);
+}
+void loop() {
+if (irrecv.decode(&results)) {
+// print() & println() can't handle printing long longs. (uint64_t)
+long btnValue = results.value;
+serialPrintUint64(btnValue);
+Serial.println("");
+switch(btnValue){
+case 16718055:
+case 16736925:
+case 16712445:
+digitalWrite(2,HIGH);
+digitalWrite(13,HIGH);
+Serial.println("Up arrow");
+break;
+case 16730805:
+case 16754775:
+case 16720605:
+digitalWrite(2,LOW);
+digitalWrite(13,LOW);
+Serial.println("Down arrow");
+break;
+case 16738455:
+case 16728765:
+case 16753245:
+Serial.println("Local Control");
+break;
+case 16756815:
+case 16732845:
+case 16769565:
+Serial.println("Cloud Control");
+break;
+default:
+Serial.println("Not a valid key");
+break;
+}
+irrecv.resume(); // Receive the next value
+}
+delay(100);
+}
